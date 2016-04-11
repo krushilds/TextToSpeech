@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">GridViewExample</string>
+
+    <string-array name="country_names">
+        <item>i</item>
+        <item>me</item>
+        <item>you</item>
+    </string-array>
+
+</resources>
