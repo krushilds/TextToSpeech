@@ -3,8 +3,23 @@
 
     <string-array name="country_names">
         <item>i</item>
+        <item>icopy</item>
+        <item>icopyy</item>
+        <item>ii</item>
+        <item>iic</item>
+        <item>iicc</item>
         <item>me</item>
+        <item>mecopy</item>
+        <item>mecopyy</item>
+        <item>mee</item>
+        <item>meec</item>
+        <item>meeec</item>
         <item>you</item>
+        <item>youcopy</item>
+        <item>youcopyy</item>
+        <item>youu</item>
+        <item>youuc</item>
+        <item>youuuc</item>
     </string-array>
 
 </resources>

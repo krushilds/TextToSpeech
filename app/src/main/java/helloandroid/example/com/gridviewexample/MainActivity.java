@@ -4,8 +4,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.provider.SyncStateContract;
 import android.speech.tts.TextToSpeech;
 import android.os.Bundle;
+import android.text.method.ScrollingMovementMethod;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +19,7 @@ import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.ViewFlipper;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -33,6 +36,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     TextView mytext;
     String text;
     Button nextbutton, prevbutton;
+    ViewFlipper flipper;
 
 
 
@@ -45,11 +49,13 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
         // findviewbyId returns view object, i also performed casting to import gridview lib
         myGrid=(GridView) findViewById(R.id.gridView);
         gview2= (GridView) findViewById(R.id.gridView2);
+        flipper = (ViewFlipper) findViewById(R.id.viewFlipper);
 
         nextbutton = (Button) findViewById(R.id.button2);
         prevbutton = (Button) findViewById(R.id.button3);
 
         mytext = (TextView) findViewById(R.id.textView);
+        mytext.setMovementMethod(new ScrollingMovementMethod());
 
 
         nextbutton.setOnClickListener(new View.OnClickListener() {
@@ -84,7 +90,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         ttsobject = new TextToSpeech(MainActivity.this, new TextToSpeech.OnInitListener() {
 
-            @Override
+
             public void onInit(int status) {
 
                 if (status == TextToSpeech.SUCCESS){
@@ -103,12 +109,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 
             });
-
-
-
-
-
-
 
     }
 
@@ -154,31 +154,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
 
 
-//    Button delete = (Button) findViewById(R.id.button4);
-//    if(delete != null){
-//        delete.setOnClickListener(new onClickListner(){
-//            public void onClick(){
-//                String deletetext = mytext.getText().toString();
-//                if (deletetext.length() > 0 ){
-//                mytext.setText(deletetext.substring(0, deletetext.length() -1));
-//                    mytext.setSelection(mytext.getText().length());
-//
-//
-//                }
-//            }
-//        });
-//    }
-    
-
-
-
-
-
-
-
-
-
-
     // the first perameter inside onitemclick method 'adapterview' represents the gridview,
     // the second perameter view represents the single item that was clicked inside the gridview,
     // the third is the position where the item was clicked(position of the image inside gridview,
@@ -195,15 +170,24 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 //        startActivity(intent);
 //
 
-        Intent intent=new Intent();
-        if (intent!=null){
+        Intent intent = new Intent();
 
-            ViewHolder holder= (ViewHolder) view.getTag();
-            Country temp= (Country) holder.myCountry.getTag();
-            intent.putExtra("countryName",temp.countryName);
+        if (i == 0) {
+
+            myGrid.setVisibility(View.GONE);
+            gview2.setVisibility(View.VISIBLE);
+            System.out.println("went to second");
+
+        }
+
+        if (intent != null) {
+
+            ViewHolder holder = (ViewHolder) view.getTag();
+            Country temp = (Country) holder.myCountry.getTag();
+            intent.putExtra("countryName", temp.countryName);
             String countryname =intent.getStringExtra("countryName");
 
-            countryname = mytext.getText()+ " " + countryname ;
+            countryname = mytext.getText() + " " + countryname;
 
             TextView mytext = (TextView) findViewById(R.id.textView);
             mytext.setText(countryname);
@@ -257,8 +241,25 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             list=new ArrayList<Country>();
             Resources res = context.getResources();
             String[] tempCountryNames=res.getStringArray(R.array.country_names);
-            int[] countryImages = {R.drawable.i,R.drawable.me,R.drawable.you};
-            for (int i=0; i<3; i++){
+            int[] countryImages = {R.drawable.i,
+                    R.drawable.icopy,
+                    R.drawable.icopyy,
+                    R.drawable.ii,
+                    R.drawable.iic,
+                    R.drawable.iicc,
+                    R.drawable.me,
+                    R.drawable.mecopy,
+                    R.drawable.mecopyy,
+                    R.drawable.mee,
+                    R.drawable.meec,
+                    R.drawable.meeec,
+                    R.drawable.you,
+                    R.drawable.youcopy,
+                    R.drawable.youcopyy,
+                    R.drawable.youu,
+                    R.drawable.youuc,
+                    R.drawable.youuuc};
+            for (int i = 0; i < 18; i++) {
 
                 Country tempCountry = new Country(countryImages[i], tempCountryNames[i]);
                 list.add(tempCountry);
