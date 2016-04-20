@@ -1,13 +1,16 @@
 package helloandroid.example.com.gridviewexample;
 
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Resources;
 import android.provider.SyncStateContract;
 import android.speech.tts.TextToSpeech;
 import android.os.Bundle;
+import android.support.v4.content.res.TypedArrayUtils;
 import android.text.method.ScrollingMovementMethod;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,7 +24,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Locale;
 
 public class MainActivity extends Activity implements AdapterView.OnItemClickListener {
@@ -37,7 +42,8 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     String text;
     Button nextbutton, prevbutton;
     ViewFlipper flipper;
-
+    VivzAdaper vivzAdaper;
+    DrinkAdaper drinkAdaper;
 
 
 
@@ -62,7 +68,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             @Override
             public void onClick(View v) {
 
-                myGrid.setVisibility(View.GONE);
+                myGrid.setVisibility(View.INVISIBLE);
                 gview2.setVisibility(View.VISIBLE);
 
             }
@@ -73,18 +79,79 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             public void onClick(View v) {
 
                 myGrid.setVisibility(View.VISIBLE);
-                gview2.setVisibility(View.GONE);
+                gview2.setVisibility(View.INVISIBLE);
 
             }
         });
 
 
-
-
-
-
-        myGrid.setAdapter(new VivzAdaper(this));
+        vivzAdaper = new VivzAdaper(this);
+        myGrid.setAdapter(vivzAdaper);
         myGrid.setOnItemClickListener(this);
+
+
+        drinkAdaper = new DrinkAdaper(this);
+        gview2.setAdapter(drinkAdaper);
+        gview2.setOnItemClickListener(this);
+
+
+        gview2.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                Intent secondint = new Intent();
+                if (secondint != null) {
+
+                    DrinksHolder drinksHolder = (DrinksHolder) view.getTag();
+                    Drinks temp2 = (Drinks) drinksHolder.drinksHolder.getTag();
+                    secondint.putExtra("drinkNames", temp2.drinkNames);
+                    String drinksnames = secondint.getStringExtra("drinkNames");
+                    drinksnames = mytext.getText() + " " + drinksnames;
+                    TextView mytext = (TextView) findViewById(R.id.textView);
+                    mytext.setText(drinksnames);
+                    ttsobject.speak(temp2.drinkNames, TextToSpeech.QUEUE_FLUSH, null);
+
+                }
+
+            }
+        });
+
+
+        myGrid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+
+                System.out.println(position);
+
+
+                // vivzAdaper.add(new Country(R.drawable.coffee, "New Country"));
+                // myGrid.setAdapter(vivzAdaper);
+
+
+                CharSequence text = vivzAdaper.list.remove(position).countryName + "deleted.";
+                myGrid.setAdapter(vivzAdaper);
+                vivzAdaper.notifyDataSetChanged();
+
+
+                int duration = Toast.LENGTH_SHORT;
+                Toast toast = Toast.makeText(getApplicationContext(), text, duration);
+                toast.show();
+
+
+                return false;
+            }
+        });
+
+
+        //myGrid.setOnItemLongClickListener(this);
+
+
+//        myGrid.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+
+
+
+
+
 
 
 
@@ -110,6 +177,20 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
             });
 
+    }
+
+    @Override
+    protected void onDestroy() {
+
+
+        //Close the Text to Speech Library
+        if (ttsobject != null) {
+
+            ttsobject.stop();
+            ttsobject.shutdown();
+            Log.d(text, "TTS Destroyed");
+        }
+        super.onDestroy();
     }
 
     public void sayWord(View v){
@@ -153,7 +234,6 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
     }
 
 
-
     // the first perameter inside onitemclick method 'adapterview' represents the gridview,
     // the second perameter view represents the single item that was clicked inside the gridview,
     // the third is the position where the item was clicked(position of the image inside gridview,
@@ -174,8 +254,7 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
 
         if (i == 0) {
 
-            myGrid.setVisibility(View.GONE);
-            gview2.setVisibility(View.VISIBLE);
+            flipper.showNext();
             System.out.println("went to second");
 
         }
@@ -192,125 +271,29 @@ public class MainActivity extends Activity implements AdapterView.OnItemClickLis
             TextView mytext = (TextView) findViewById(R.id.textView);
             mytext.setText(countryname);
 
+            ttsobject.speak(temp.countryName, TextToSpeech.QUEUE_FLUSH, null);
 
-        }
-
-
-
-    }
-
-
-    class Country{
-
-        int imageId;
-        String countryName;
-
-        //constructor
-        Country (int imageId, String countryName){
-
-            this.imageId = imageId;
-            this.countryName = countryName;
+            //temp.countryname - to say only the word thats clicked
+            //countryname - to say everything because its a string
 
         }
 
 
     }
 
-
-    class ViewHolder{
-
-        ImageView myCountry;
-
-        ViewHolder(View v){
-
-            myCountry= (ImageView) v.findViewById(R.id.imageView);
-
-        }
-    }
+//    public void removeItem(int pos, String list){
+//        ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(list));
+//        arrayList.remove(pos);
+//        list = new String[arrayList.size()];
+//        arrayList.toArray(list);
+//        this.notifyDataSetChanged();
+//    }
 
 
-    class VivzAdaper extends BaseAdapter{
+    //    ArrayList<String> arrayList = new ArrayList<>(Arrays.asList(mobileValues));
+    // this country class will combine both image and its name together
 
 
-
-        ArrayList<Country> list;
-        Context context;
-        // created object 'context' so that i can get all the list of the names from xml file
-        VivzAdaper(Context context){
-            this.context=context;
-            list=new ArrayList<Country>();
-            Resources res = context.getResources();
-            String[] tempCountryNames=res.getStringArray(R.array.country_names);
-            int[] countryImages = {R.drawable.i,
-                    R.drawable.icopy,
-                    R.drawable.icopyy,
-                    R.drawable.ii,
-                    R.drawable.iic,
-                    R.drawable.iicc,
-                    R.drawable.me,
-                    R.drawable.mecopy,
-                    R.drawable.mecopyy,
-                    R.drawable.mee,
-                    R.drawable.meec,
-                    R.drawable.meeec,
-                    R.drawable.you,
-                    R.drawable.youcopy,
-                    R.drawable.youcopyy,
-                    R.drawable.youu,
-                    R.drawable.youuc,
-                    R.drawable.youuuc};
-            for (int i = 0; i < 18; i++) {
-
-                Country tempCountry = new Country(countryImages[i], tempCountryNames[i]);
-                list.add(tempCountry);
-
-            }
-
-        }
-
-
-
-        @Override
-        public int getCount() {
-            return list.size();
-        }
-
-        @Override
-        public Object getItem(int i) {
-            return list.get(i);
-        }
-
-        @Override
-        public long getItemId(int i) {
-            return i;
-        }
-
-
-
-        @Override
-        public View getView(int i, View view, ViewGroup viewGroup) {
-
-            ViewHolder holder=null;
-            View row=view;
-            if (row==null){
-
-                LayoutInflater inflater= (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                // inflate will take the xml file and give me java object
-                 row=inflater.inflate(R.layout.single_item,viewGroup,false);
-                holder=new ViewHolder(row);
-                row.setTag(holder);
-            }
-            else
-            {
-                holder= (ViewHolder) row.getTag();
-            }
-            Country temp=list.get(i);
-            holder.myCountry.setImageResource(temp.imageId);
-            holder.myCountry.setTag(temp);
-
-            return row;
-        }
-    }
 
 
 }
